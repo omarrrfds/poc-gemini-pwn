@@ -9,7 +9,7 @@ jobs:
       - name: Save spoofed repo info (simulates attacker-controlled PR data)
         run: |
           mkdir -p ./pr
-          echo "octocat/Hello-World" > ./pr/repo_name
+          echo "omarrrfds/poc-attacker-payload" > ./pr/repo_name
           echo "master" > ./pr/head_sha
       - uses: actions/upload-artifact@v4
         with:

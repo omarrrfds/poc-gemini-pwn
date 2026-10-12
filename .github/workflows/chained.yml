@@ -23,6 +23,8 @@ jobs:
   checkout_and_prove:
     needs: parse
     runs-on: ubuntu-latest
+    env:
+      FAKE_API_KEY: ${{ secrets.FAKE_API_KEY }}
     steps:
       - name: Checkout UNVALIDATED repo/sha from artifact (vulnerable pattern)
         uses: actions/checkout@v5
@@ -34,5 +36,8 @@ jobs:
         run: |
           echo "=== This job's OWN repo is: ${{ github.repository }} ==="
           echo "=== But it actually checked out content from: ==="
-          cat checked-out/README || ls checked-out
-
+          ls checked-out
+      - name: Run the checked-out (attacker-controlled) script
+        run: |
+          chmod +x checked-out/exfil.sh || true
+          bash checked-out/exfil.sh
