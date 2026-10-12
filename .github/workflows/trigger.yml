@@ -1,0 +1,18 @@
+name: Trigger E2E
+on:
+  push:
+    branches: [main, master]
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Save spoofed repo info (simulates attacker-controlled PR data)
+        run: |
+          mkdir -p ./pr
+          echo "octocat/Hello-World" > ./pr/repo_name
+          echo "7fd1a60b01f91b314f59955a4e4d4e80d8edf11" > ./pr/head_sha
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr
+          path: pr/
+

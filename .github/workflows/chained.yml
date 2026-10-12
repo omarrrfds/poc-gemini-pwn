@@ -1,0 +1,37 @@
+name: Chained E2E
+on:
+  workflow_run:
+    workflows: ['Trigger E2E']
+    types: ['completed']
+jobs:
+  parse:
+    runs-on: ubuntu-latest
+    outputs:
+      repo: ${{ steps.dl.outputs.repo }}
+      sha: ${{ steps.dl.outputs.sha }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pr
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - id: dl
+        run: |
+          echo "repo=$(cat pr/repo_name)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(cat pr/head_sha)" >> "$GITHUB_OUTPUT"
+  checkout_and_prove:
+    needs: parse
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout UNVALIDATED repo/sha from artifact (vulnerable pattern)
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ needs.parse.outputs.repo }}
+          ref: ${{ needs.parse.outputs.sha }}
+          path: checked-out
+      - name: Prove it checked out attacker-specified content, not our own repo
+        run: |
+          echo "=== This job's OWN repo is: ${{ github.repository }} ==="
+          echo "=== But it actually checked out content from: ==="
+          cat checked-out/README || ls checked-out
+
