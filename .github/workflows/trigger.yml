@@ -10,7 +10,7 @@ jobs:
         run: |
           mkdir -p ./pr
           echo "octocat/Hello-World" > ./pr/repo_name
-          echo "7fd1a60b01f91b314f59955a4e4d4e80d8edf11" > ./pr/head_sha
+          echo "master" > ./pr/head_sha
       - uses: actions/upload-artifact@v4
         with:
           name: pr
